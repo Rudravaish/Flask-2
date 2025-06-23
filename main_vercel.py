@@ -1,3 +1,6 @@
+# Vercel Deployment Helper
+# This is a comment to force a new build hash.
+
 from flask import Flask, render_template, request, flash, redirect, url_for, jsonify
 import os
 import logging
