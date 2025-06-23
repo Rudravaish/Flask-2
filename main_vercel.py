@@ -258,6 +258,9 @@ def home():
                         'image_analysis': analysis_data.get('image_analysis', {})
                     }
                 
+                # Create a boolean to safely control display in the template
+                show_manual_measurements = manual_length > 0 and manual_width > 0
+                
                 # Convert image to base64 for display
                 image_base64 = base64.b64encode(file_data).decode('utf-8')
                 image_data_url = f"data:image/jpeg;base64,{image_base64}"
@@ -277,7 +280,8 @@ def home():
                                      uv_exposure=uv_exposure,
                                      family_history=family_history,
                                      manual_length=manual_length,
-                                     manual_width=manual_width)
+                                     manual_width=manual_width,
+                                     show_manual_measurements=show_manual_measurements)
                 
             except Exception as e:
                 app.logger.error(f"Prediction error: {str(e)}")
