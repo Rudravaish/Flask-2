@@ -394,46 +394,39 @@
                                 </h2>
                                 <div id="abcdeCollapse" class="accordion-collapse collapse show" aria-labelledby="abcdeHeading" data-bs-parent="#analysisAccordion">
                                     <div class="accordion-body">
-                                        <div class="row mb-2">
-                                            <div class="col-6">
-                                                <strong>Asymmetry:</strong>
-                                                <span class="badge fs-6 {{ 'bg-danger' if analysis_summary.ABCDE_feature_analysis.asymmetry > 0.6 else 'bg-warning' if analysis_summary.ABCDE_feature_analysis.asymmetry > 0.4 else 'bg-success' }}">
-                                                    {{ "%.2f"|format(analysis_summary.ABCDE_feature_analysis.asymmetry) }}
+                                        <h5 class="mt-4">ABCDE Feature Analysis</h5>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span><i class="fas fa-vector-square me-2"></i>Asymmetry</span>
+                                                <span class="badge fs-6 {{ 'bg-danger' if analysis_summary.ABCDE_feature_analysis.asymmetry.score > 0.6 else 'bg-warning' if analysis_summary.ABCDE_feature_analysis.asymmetry.score > 0.4 else 'bg-success' }}">
+                                                    {{ analysis_summary.ABCDE_feature_analysis.asymmetry.label }}
                                                 </span>
-                                            </div>
-                                            <div class="col-6">
-                                                <strong>Border Irregularity:</strong>
-                                                <span class="badge fs-6 {{ 'bg-danger' if analysis_summary.ABCDE_feature_analysis.border > 0.6 else 'bg-warning' if analysis_summary.ABCDE_feature_analysis.border > 0.4 else 'bg-success' }}">
-                                                    {{ "%.2f"|format(analysis_summary.ABCDE_feature_analysis.border) }}
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span><i class="fas fa-border-style me-2"></i>Border</span>
+                                                <span class="badge fs-6 {{ 'bg-danger' if analysis_summary.ABCDE_feature_analysis.border.score > 0.6 else 'bg-warning' if analysis_summary.ABCDE_feature_analysis.border.score > 0.4 else 'bg-success' }}">
+                                                    {{ analysis_summary.ABCDE_feature_analysis.border.label }}
                                                 </span>
-                                            </div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-6">
-                                                <strong>Color Variation:</strong>
-                                                <span class="badge fs-6 {{ 'bg-danger' if analysis_summary.ABCDE_feature_analysis.color > 0.6 else 'bg-warning' if analysis_summary.ABCDE_feature_analysis.color > 0.4 else 'bg-success' }}">
-                                                    {{ "%.2f"|format(analysis_summary.ABCDE_feature_analysis.color) }}
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span><i class="fas fa-palette me-2"></i>Color</span>
+                                                <span class="badge fs-6 {{ 'bg-danger' if analysis_summary.ABCDE_feature_analysis.color.score > 0.6 else 'bg-warning' if analysis_summary.ABCDE_feature_analysis.color.score > 0.4 else 'bg-success' }}">
+                                                    {{ analysis_summary.ABCDE_feature_analysis.color.label }}
                                                 </span>
-                                            </div>
-                                            <div class="col-6">
-                                                <strong>Diameter/Size:</strong>
-                                                <span class="badge fs-6 {{ 'bg-danger' if analysis_summary.ABCDE_feature_analysis.diameter > 0.6 else 'bg-warning' if analysis_summary.ABCDE_feature_analysis.diameter > 0.4 else 'bg-success' }}">
-                                                    {{ "%.2f"|format(analysis_summary.ABCDE_feature_analysis.diameter) }}
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span><i class="fas fa-ruler-horizontal me-2"></i>Diameter</span>
+                                                <span class="badge fs-6 {{ 'bg-danger' if analysis_summary.ABCDE_feature_analysis.diameter.score > 0.6 else 'bg-warning' if analysis_summary.ABCDE_feature_analysis.diameter.score > 0.4 else 'bg-success' }}">
+                                                    {{ analysis_summary.ABCDE_feature_analysis.diameter.label }}
                                                 </span>
-                                            </div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-6">
-                                                <strong>Evolution:</strong>
-                                                <span class="badge fs-6 {{ 'bg-danger' if analysis_summary.ABCDE_feature_analysis.evolution > 0.6 else 'bg-warning' if analysis_summary.ABCDE_feature_analysis.evolution > 0.4 else 'bg-success' }}">
-                                                    {{ "%.2f"|format(analysis_summary.ABCDE_feature_analysis.evolution) }}
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span><i class="fas fa-history me-2"></i>Evolution</span>
+                                                <span class="badge fs-6 {{ 'bg-danger' if analysis_summary.ABCDE_feature_analysis.evolution.score > 0.6 else 'bg-warning' if analysis_summary.ABCDE_feature_analysis.evolution.score > 0.4 else 'bg-success' }}">
+                                                    {{ analysis_summary.ABCDE_feature_analysis.evolution.label }}
                                                 </span>
-                                            </div>
-                                        </div>
-                                        <div class="alert alert-info mt-3 mb-0">
-                                            <strong>What does this mean?</strong><br>
-                                            {{ analysis_summary.ABCDE_feature_analysis.explanation }}
-                                        </div>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>

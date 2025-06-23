@@ -102,7 +102,7 @@ def analyze_image_simple(image_data):
 
 def predict_lesion_simple(image_data, skin_type, body_part, has_evolved, evolution_weeks, 
                          manual_length, manual_width, age, uv_exposure, family_history):
-    """Simplified prediction function using OpenCV"""
+    """Simplified prediction function using OpenCV and returning numeric scores for ABCDE."""
     try:
         import random
         
@@ -127,6 +127,13 @@ def predict_lesion_simple(image_data, skin_type, body_part, has_evolved, evoluti
             if image_analysis.get('brightness', 0) < 100:
                 risk_factors += 1
             
+        # --- NEW: Generate numeric scores and labels for ABCDE features ---
+        asymmetry_score = random.uniform(0.1, 0.4) if risk_factors < 2 else random.uniform(0.5, 0.8)
+        border_score = random.uniform(0.1, 0.4) if risk_factors < 2 else random.uniform(0.5, 0.8)
+        color_score = random.uniform(0.1, 0.4) if risk_factors < 2 else random.uniform(0.5, 0.8)
+        diameter_score = random.uniform(0.1, 0.4) if manual_length < 6 else random.uniform(0.6, 0.9)
+        evolution_score = 0.8 if has_evolved else 0.1
+
         # Mock prediction
         if risk_factors >= 3:
             prediction = "High Risk - Melanoma"
@@ -140,11 +147,11 @@ def predict_lesion_simple(image_data, skin_type, body_part, has_evolved, evoluti
             
         return prediction, confidence, {
             'ABCDE_feature_analysis': {
-                'asymmetry': 'Low' if risk_factors < 2 else 'Medium',
-                'border': 'Regular' if risk_factors < 2 else 'Irregular',
-                'color': 'Uniform' if risk_factors < 2 else 'Variable',
-                'diameter': 'Normal' if risk_factors < 2 else 'Large',
-                'evolution': 'Stable' if not has_evolved else 'Changing'
+                'asymmetry': {'score': asymmetry_score, 'label': 'Low' if asymmetry_score <= 0.4 else 'High'},
+                'border': {'score': border_score, 'label': 'Regular' if border_score <= 0.4 else 'Irregular'},
+                'color': {'score': color_score, 'label': 'Uniform' if color_score <= 0.4 else 'Variable'},
+                'diameter': {'score': diameter_score, 'label': 'Normal (<6mm)' if diameter_score <= 0.5 else 'Large (>=6mm)'},
+                'evolution': {'score': evolution_score, 'label': 'Stable' if evolution_score <= 0.5 else 'Changing'}
             },
             'cnn_analysis': {
                 'prediction': prediction,
@@ -165,7 +172,7 @@ def predict_lesion_simple(image_data, skin_type, body_part, has_evolved, evoluti
         }
         
     except Exception as e:
-        app.logger.error(f"Prediction error: {e}")
+        app.logger.error(f"Prediction error: {e}", exc_info=True)
         return "Error - Unable to analyze", 0, {}
 
 @app.route('/', methods=['GET', 'POST'])
