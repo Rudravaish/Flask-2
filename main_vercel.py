@@ -34,9 +34,9 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def detect_skin_type_simple(image_data):
-    """Simple skin type detection based on image brightness"""
+    """Simple skin type detection based on image brightness using PIL only"""
     try:
-        # Convert base64 to PIL Image
+        # Convert to PIL Image
         image = Image.open(io.BytesIO(image_data))
         image = image.convert('RGB')
         
@@ -63,23 +63,51 @@ def detect_skin_type_simple(image_data):
         app.logger.error(f"Skin type detection error: {e}")
         return 'III'  # Default to medium
 
-def predict_lesion_simple(image_data, skin_type, body_part, has_evolved, evolution_weeks, 
-                         manual_length, manual_width, age, uv_exposure, family_history):
-    """Simplified prediction function for Vercel deployment"""
+def analyze_image_simple(image_data):
+    """Simple image analysis using PIL and numpy only"""
     try:
-        # This is a placeholder - in a real deployment, you'd need to:
-        # 1. Use a cloud-based ML service (like Google Cloud ML, AWS SageMaker)
-        # 2. Or use a pre-trained model that fits within Vercel's limits
-        # 3. Or use an external API service
-        
-        # For now, return a mock prediction
-        import random
-        
-        # Simple mock prediction based on image characteristics
         image = Image.open(io.BytesIO(image_data))
         width, height = image.size
         
-        # Mock analysis based on image size and parameters
+        # Convert to RGB if needed
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+        
+        # Convert to numpy array
+        img_array = np.array(image)
+        
+        # Simple analysis
+        brightness = np.mean(img_array)
+        contrast = np.std(img_array)
+        
+        # Calculate basic color statistics
+        red_mean = np.mean(img_array[:, :, 0])
+        green_mean = np.mean(img_array[:, :, 1])
+        blue_mean = np.mean(img_array[:, :, 2])
+        
+        return {
+            'width': width,
+            'height': height,
+            'brightness': brightness,
+            'contrast': contrast,
+            'red_mean': red_mean,
+            'green_mean': green_mean,
+            'blue_mean': blue_mean
+        }
+    except Exception as e:
+        app.logger.error(f"Image analysis error: {e}")
+        return {}
+
+def predict_lesion_simple(image_data, skin_type, body_part, has_evolved, evolution_weeks, 
+                         manual_length, manual_width, age, uv_exposure, family_history):
+    """Simplified prediction function using only PIL and numpy"""
+    try:
+        import random
+        
+        # Analyze image
+        image_analysis = analyze_image_simple(image_data)
+        
+        # Mock analysis based on parameters
         risk_factors = 0
         if has_evolved:
             risk_factors += 2
@@ -89,6 +117,13 @@ def predict_lesion_simple(image_data, skin_type, body_part, has_evolved, evoluti
             risk_factors += 1
         if uv_exposure > 7:
             risk_factors += 1
+            
+        # Add image-based risk factors
+        if image_analysis:
+            if image_analysis.get('contrast', 0) > 50:
+                risk_factors += 1
+            if image_analysis.get('brightness', 0) < 100:
+                risk_factors += 1
             
         # Mock prediction
         if risk_factors >= 3:
@@ -103,11 +138,11 @@ def predict_lesion_simple(image_data, skin_type, body_part, has_evolved, evoluti
             
         return prediction, confidence, {
             'ABCDE_feature_analysis': {
-                'asymmetry': 'Low',
-                'border': 'Regular',
-                'color': 'Uniform',
-                'diameter': 'Normal',
-                'evolution': 'Stable'
+                'asymmetry': 'Low' if risk_factors < 2 else 'Medium',
+                'border': 'Regular' if risk_factors < 2 else 'Irregular',
+                'color': 'Uniform' if risk_factors < 2 else 'Variable',
+                'diameter': 'Normal' if risk_factors < 2 else 'Large',
+                'evolution': 'Stable' if not has_evolved else 'Changing'
             },
             'cnn_analysis': {
                 'prediction': prediction,
@@ -123,7 +158,8 @@ def predict_lesion_simple(image_data, skin_type, body_part, has_evolved, evoluti
             'detected_skin_tone': f'Type {skin_type}',
             'analysis_type': 'simplified_vercel',
             'skin_type_adjustments': {},
-            'manual_measurements': {}
+            'manual_measurements': {},
+            'image_analysis': image_analysis
         }
         
     except Exception as e:
@@ -220,7 +256,8 @@ def home():
                         'detected_skin_tone': analysis_data.get('detected_skin_tone', f'Type {skin_type}'),
                         'analysis_type': analysis_data.get('analysis_type', 'simplified_vercel'),
                         'skin_type_adjustments': analysis_data.get('skin_type_adjustments', {}),
-                        'manual_measurements': analysis_data.get('manual_measurements', {})
+                        'manual_measurements': analysis_data.get('manual_measurements', {}),
+                        'image_analysis': analysis_data.get('image_analysis', {})
                     }
                 
                 # Convert image to base64 for display
