@@ -6,6 +6,7 @@ import base64
 import io
 from PIL import Image
 import numpy as np
+import cv2
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -34,17 +35,17 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def detect_skin_type_simple(image_data):
-    """Simple skin type detection based on image brightness using PIL only"""
+    """Simple skin type detection based on image brightness using OpenCV"""
     try:
-        # Convert to PIL Image
-        image = Image.open(io.BytesIO(image_data))
-        image = image.convert('RGB')
-        
-        # Convert to numpy array
-        img_array = np.array(image)
+        # Decode image from memory
+        nparr = np.frombuffer(image_data, np.uint8)
+        img_np = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+        # Convert to grayscale to calculate brightness
+        gray_image = cv2.cvtColor(img_np, cv2.COLOR_BGR2GRAY)
         
         # Calculate average brightness
-        brightness = np.mean(img_array)
+        brightness = np.mean(gray_image)
         
         # Simple classification based on brightness
         if brightness < 85:
@@ -64,27 +65,25 @@ def detect_skin_type_simple(image_data):
         return 'III'  # Default to medium
 
 def analyze_image_simple(image_data):
-    """Simple image analysis using PIL and numpy only"""
+    """Simple image analysis using OpenCV"""
     try:
-        image = Image.open(io.BytesIO(image_data))
-        width, height = image.size
+        # Decode image from memory
+        nparr = np.frombuffer(image_data, np.uint8)
+        img_np = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
-        # Convert to RGB if needed
-        if image.mode != 'RGB':
-            image = image.convert('RGB')
+        # Get dimensions
+        height, width, _ = img_np.shape
         
-        # Convert to numpy array
-        img_array = np.array(image)
+        # Convert to grayscale for analysis
+        gray_image = cv2.cvtColor(img_np, cv2.COLOR_BGR2GRAY)
         
         # Simple analysis
-        brightness = np.mean(img_array)
-        contrast = np.std(img_array)
+        brightness = np.mean(gray_image)
+        contrast = np.std(gray_image)
         
-        # Calculate basic color statistics
-        red_mean = np.mean(img_array[:, :, 0])
-        green_mean = np.mean(img_array[:, :, 1])
-        blue_mean = np.mean(img_array[:, :, 2])
-        
+        # Calculate basic color statistics from original color image
+        blue_mean, green_mean, red_mean = np.mean(img_np, axis=(0, 1))
+
         return {
             'width': width,
             'height': height,
@@ -100,7 +99,7 @@ def analyze_image_simple(image_data):
 
 def predict_lesion_simple(image_data, skin_type, body_part, has_evolved, evolution_weeks, 
                          manual_length, manual_width, age, uv_exposure, family_history):
-    """Simplified prediction function using only PIL and numpy"""
+    """Simplified prediction function using OpenCV"""
     try:
         import random
         
@@ -317,5 +316,6 @@ def handle_exception(e):
     app.logger.error(f"Unhandled exception: {str(e)}")
     return render_template('index.html', error="An unexpected error occurred"), 500
 
+# This check is not needed for Vercel deployment, but good for local testing
 if __name__ == '__main__':
     app.run(debug=True) 
