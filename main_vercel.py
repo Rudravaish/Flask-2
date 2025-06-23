@@ -229,6 +229,9 @@ def home():
             # Read file data into memory (no file system writes)
             file_data = file.read()
             
+            # Create a boolean to safely control display in the template
+            show_manual_measurements = manual_length > 0 and manual_width > 0
+            
             # Detect skin tone from image
             detected_skin_type = detect_skin_type_simple(file_data)
             skin_type = detected_skin_type  # Override form value with detected
@@ -258,9 +261,6 @@ def home():
                         'image_analysis': analysis_data.get('image_analysis', {})
                     }
                 
-                # Create a boolean to safely control display in the template
-                show_manual_measurements = manual_length > 0 and manual_width > 0
-                
                 # Convert image to base64 for display
                 image_base64 = base64.b64encode(file_data).decode('utf-8')
                 image_data_url = f"data:image/jpeg;base64,{image_base64}"
@@ -284,12 +284,14 @@ def home():
                                      show_manual_measurements=show_manual_measurements)
                 
             except Exception as e:
-                app.logger.error(f"Prediction error: {str(e)}")
+                # Add more detailed logging to see the full traceback
+                app.logger.error(f"Prediction error in route: {str(e)}", exc_info=True)
                 flash('Error processing image. Please try again with a different image.', 'error')
                 return redirect(request.url)
                 
         except Exception as e:
-            app.logger.error(f"Upload error: {str(e)}")
+            # Add more detailed logging to see the full traceback
+            app.logger.error(f"Upload error in route: {str(e)}", exc_info=True)
             flash('An error occurred while processing your upload. Please try again.', 'error')
             return redirect(request.url)
     
