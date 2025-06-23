@@ -212,20 +212,19 @@ def home():
             except Exception:
                 uv_exposure = 5
             family_history = 'family_history' in request.form
-            manual_length = request.form.get('manual_length')
-            manual_width = request.form.get('manual_width')
             
-            # Convert manual measurements to float if provided
-            if manual_length:
-                try:
-                    manual_length = float(manual_length)
-                except ValueError:
-                    manual_length = None
-            if manual_width:
-                try:
-                    manual_width = float(manual_width)
-                except ValueError:
-                    manual_width = None
+            # Convert manual measurements to float, ensuring they are never invalid types
+            manual_length_raw = request.form.get('manual_length')
+            try:
+                manual_length = float(manual_length_raw) if manual_length_raw and manual_length_raw.strip() else 0.0
+            except (ValueError, TypeError):
+                manual_length = 0.0
+            
+            manual_width_raw = request.form.get('manual_width')
+            try:
+                manual_width = float(manual_width_raw) if manual_width_raw and manual_width_raw.strip() else 0.0
+            except (ValueError, TypeError):
+                manual_width = 0.0
             
             # Read file data into memory (no file system writes)
             file_data = file.read()
