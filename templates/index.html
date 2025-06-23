@@ -444,17 +444,17 @@
                                         <div class="row mb-2">
                                             <div class="col-6">
                                                 <strong>CNN Prediction:</strong>
-                                                <span class="badge fs-6 {{ 'bg-danger' if analysis_summary.cnn_analysis.cnn_prediction == 'Malignant' else 'bg-success' }}">
-                                                    {{ analysis_summary.cnn_analysis.cnn_prediction }}
+                                                <span class="badge fs-6 {{ 'bg-danger' if analysis_summary.cnn_analysis.prediction == 'Malignant' else 'bg-success' }}">
+                                                    {{ analysis_summary.cnn_analysis.prediction }}
                                                 </span>
                                             </div>
                                             <div class="col-6">
                                                 <strong>CNN Confidence:</strong>
                                                 <span class="badge bg-info fs-6">
-                                                    {% if analysis_summary.cnn_analysis.cnn_prediction == 'Malignant' %}
-                                                        {{ "%.1f"|format(analysis_summary.cnn_analysis.cnn_confidence * 100) }}%
+                                                    {% if analysis_summary.cnn_analysis.prediction == 'Malignant' %}
+                                                        {{ "%.1f"|format(analysis_summary.cnn_analysis.confidence * 100) }}%
                                                     {% else %}
-                                                        {{ "%.1f"|format((1 - analysis_summary.cnn_analysis.cnn_confidence) * 100) }}%
+                                                        {{ "%.1f"|format((1 - analysis_summary.cnn_analysis.confidence) * 100) }}%
                                                     {% endif %}
                                                 </span>
                                             </div>
